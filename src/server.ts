@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-import app from './index';
-import { initializeDatabase } from './config/database';
 
 dotenv.config();
+
+import app from './index';
+import { initializeDatabase } from './config/database';
 
 const PORT = process.env.PORT || 3000;
 

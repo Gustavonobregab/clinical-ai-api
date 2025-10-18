@@ -23,6 +23,7 @@ export const createNoteService = async (noteData: CreateNoteInput, file?: Expres
     audioUrl = await uploadToS3(file.path, file.originalname);
     console.log("audioUrl",audioUrl)
     rawText = await transcribeAudio(audioUrl);
+    console.log("Raw Text",rawText)
   }
 
   const newNote = noteRepo.create({

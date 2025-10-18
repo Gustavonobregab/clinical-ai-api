@@ -31,7 +31,7 @@ export async function uploadToS3(filePath: string, originalName: string): Promis
     
     fs.unlinkSync(filePath);
     
-    const publicUrl = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/audio-notes/${fileName}`;
+    const publicUrl = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION || 'us-east-2'}.amazonaws.com/audio-notes/${fileName}`;
     
     return publicUrl;
   } catch (error) {

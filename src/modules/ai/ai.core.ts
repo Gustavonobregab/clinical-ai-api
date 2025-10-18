@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
-import { env } from '../../config/env';
 import * as fs from 'fs';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
 
-const openai = env.OPENAI_API_KEY ? new OpenAI({ apiKey: env.OPENAI_API_KEY }) : null;
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
 
 export async function generateSummaryAndInsights(text: string) {
@@ -71,9 +72,47 @@ export async function transcribeAudio(audioUrl: string): Promise<string> {
     throw new Error('OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable.');
   }
 
-  const response = await openai.audio.transcriptions.create({
-    file: fs.createReadStream(audioUrl),
+  const urlMatch = audioUrl.match(/https:\/\/([^.]+)\.s3\.([^.]+)\.amazonaws\.com\/(.+)/);
+  if (!urlMatch) {
+    throw new Error('Invalid S3 URL format');
+  }
+  
+  const [, bucket, region, key] = urlMatch;
+  
+  const s3Client = new S3Client({
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+    region: region
+  });
+
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
+
+  const response = await s3Client.send(command);
+  
+  if (!response.Body) {
+    throw new Error('Failed to download audio file from S3');
+  }
+
+  const chunks: Uint8Array[] = [];
+  const stream = response.Body as Readable;
+  
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+  
+  const audioBuffer = Buffer.concat(chunks);
+  const audioBlob = new Blob([audioBuffer]);
+  const audioFile = new File([audioBlob], 'audio.ogg', { type: 'audio/ogg' });
+
+  const transcription = await openai.audio.transcriptions.create({
+    file: audioFile,
     model: 'whisper-1',
   });
-  return response.text;
+  
+  return transcription.text;
 }
