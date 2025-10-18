@@ -10,6 +10,7 @@ import {
 import { asyncHandler } from '../../utils/async-handler';
 
 const router = Router();
+
 router.post('/', asyncHandler(createNoteController));
 
 router.get('/', asyncHandler(getAllNotesController));
