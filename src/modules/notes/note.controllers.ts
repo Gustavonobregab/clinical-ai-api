@@ -6,10 +6,13 @@ import {
   getNoteByIdService, 
   getNotesByPatientIdService,
   updateNoteService,
-  deleteNoteService 
+  deleteNoteService,
+  processNoteService
 } from './note.services';
 
 export async function createNoteController(req: Request, res: Response) {
+
+  
   const parseResult = CreateNoteSchema.safeParse(req.body);
 
   if (!parseResult.success) {
@@ -22,7 +25,7 @@ export async function createNoteController(req: Request, res: Response) {
   }
 
   try {
-    const newNote = await createNoteService(parseResult.data);
+    const newNote = await createNoteService(parseResult.data, req.file);
     res.status(201).json({
       success: true,
       data: newNote
@@ -154,6 +157,24 @@ export async function deleteNoteController(req: Request, res: Response) {
     res.status(500).json({
       success: false,
       message: "Failed to delete note"
+    });
+  }
+}
+
+export async function processNoteController(req: Request, res: Response) {
+  const { id } = req.params;
+  
+  try {
+    const processedNote = await processNoteService(parseInt(id));
+    
+    res.status(200).json({
+      success: true,
+      data: processedNote
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to process note"
     });
   }
 }

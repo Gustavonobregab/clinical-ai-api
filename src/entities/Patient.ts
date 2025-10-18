@@ -20,7 +20,7 @@ import {
   
     @UpdateDateColumn()
     updatedAt!: Date;
-  
+
     @OneToMany(() => Note, (note) => note.patient)
     notes!: Note[];
   }

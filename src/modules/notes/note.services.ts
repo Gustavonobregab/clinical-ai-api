@@ -2,7 +2,7 @@ import { AppDataSource } from '../../config/database';
 import { Note } from '../../entities/Note';
 import { Patient } from '../../entities/Patient';
 import { CreateNoteInput, UpdateNoteInput } from './note.types';
-import { transcribeAudio } from '../ai/ai.core';
+import { transcribeAudio, generateSummaryAndInsights } from '../ai/ai.core';
 import { uploadToS3 } from '../../utils/upload';
 
 const noteRepo = AppDataSource.getRepository(Note);
@@ -11,13 +11,17 @@ const patientRepo = AppDataSource.getRepository(Patient);
 export const createNoteService = async (noteData: CreateNoteInput, file?: Express.Multer.File): Promise<Note> => {
   const patient = await patientRepo.findOne({ where: { id: noteData.patientId } });
 
+  console.log("note data",noteData)
+
   if (!patient) throw new Error('Patient not found');
 
   let audioUrl = undefined;
   let rawText = noteData.rawText;
 
+  
   if (noteData.inputType === 'AUDIO' && file) {
     audioUrl = await uploadToS3(file.path, file.originalname);
+    console.log("audioUrl",audioUrl)
     rawText = await transcribeAudio(audioUrl);
   }
 
@@ -73,4 +77,40 @@ export const deleteNoteService = async (id: number): Promise<boolean> => {
   
   await noteRepo.remove(note);
   return true;
+};
+
+export const processNoteService = async (noteId: number): Promise<Note> => {
+  const note = await noteRepo.findOne({ 
+    where: { id: noteId },
+    relations: ['patient']
+  });
+  
+  if (!note) {
+    throw new Error('Note not found');
+  }
+
+  if (!note.rawText) {
+    throw new Error('Note has no text content to process');
+  }
+
+  try {
+    const aiReport = await generateSummaryAndInsights(note.rawText);
+
+    note.summary = aiReport.summary;
+    note.aiMeta = {
+      insights: aiReport.insights,
+      processedAt: new Date().toISOString()
+    };
+    note.status = 'PROCESSED';
+
+    return await noteRepo.save(note);
+  } catch (error) {
+    note.status = 'FAILED';
+    note.aiMeta = {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      failedAt: new Date().toISOString()
+    };
+    await noteRepo.save(note);
+    throw new Error('Failed to process note with AI');
+  }
 };

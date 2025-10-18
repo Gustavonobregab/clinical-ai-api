@@ -20,7 +20,7 @@ import {
     @Column({ type: "enum", enum: ["TEXT", "AUDIO"], default: "TEXT" })
     inputType!: NoteInputType;
   
-    @Column({ type: "text" })
+    @Column({ type: "text", nullable: true})
     rawText!: string;
   
     @Column({ type: "text", nullable: true })

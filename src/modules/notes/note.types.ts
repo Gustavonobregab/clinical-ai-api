@@ -2,9 +2,9 @@ import { z } from "zod";
 import { Note } from "../../entities/Note";
 
 export const CreateNoteSchema = z.object({
-  patientId: z.number().int().positive("Patient ID must be a positive integer"),
+  patientId: z.coerce.number().int().positive("Patient ID must be a positive integer"),
   inputType: z.enum(["TEXT", "AUDIO"]).default("TEXT"),
-  rawText: z.string().min(1, "Raw text is required"),
+  rawText: z.string().min(1, "Raw text must be valid").optional(),
   summary: z.string().optional(),
   audioUrl: z.string().url("Audio URL must be a valid URL").optional(),
   aiMeta: z.record(z.any()).optional()

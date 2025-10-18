@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import patientRoutes from './modules/patients/patient.routes';
+import noteRoutes from './modules/notes/note.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/patients', patientRoutes);
+app.use('/notes', noteRoutes);
 
 app.use(errorHandler);
 
