@@ -1,14 +1,15 @@
 import { DataSource } from 'typeorm';
 import { Patient } from '../entities/Patient';
 import { Note } from '../entities/Note';
+import { env } from './env';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  username: env.DB_USERNAME,
+  password: env.DB_PASSWORD,
+  database: env.DB_DATABASE,
   entities: [Patient, Note],
   synchronize: true,
   logging: false,

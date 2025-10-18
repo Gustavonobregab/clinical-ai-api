@@ -17,8 +17,7 @@ export async function createPatientController(req: Request, res: Response) {
   const newPatient = await createPatientService(parseResult.data);
   res.status(201).json({
     success: true,
-    data: newPatient,
-    message: "Patient created successfully"
+    data: newPatient
   });
 }
 
@@ -28,8 +27,7 @@ export async function getAllPatientsController(req: Request, res: Response) {
   res.status(200).json({
     success: true,
     data: patients,
-    total: patients.length,
-    message: "Patients retrieved successfully"
+    total: patients.length
   });
 }
 
@@ -47,7 +45,6 @@ export async function getPatientByIdController(req: Request, res: Response) {
 
   res.status(200).json({
     success: true,
-    data: patient,
-    message: "Patient retrieved successfully"
+    data: patient
   });
 }

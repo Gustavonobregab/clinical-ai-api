@@ -12,7 +12,7 @@ export const createPatientService = async (patientData: CreatePatientInput): Pro
 
   const newPatient = patientRepository.create({
     name: patientData.name,
-    dob: patientData.dateOfBirth,
+    dob: patientData.dob,
   });
 
   return await patientRepository.save(newPatient);

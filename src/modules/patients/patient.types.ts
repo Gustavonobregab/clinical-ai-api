@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Patient } from "../../entities/Patient";
 
 export const CreatePatientSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -6,15 +7,6 @@ export const CreatePatientSchema = z.object({
 });
 
 export type CreatePatientInput = z.infer<typeof CreatePatientSchema>;
-
-export interface Patient {
-  id: number;
-  name: string;
-  dob?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  notes?: any[]; 
-}
 
 export interface PatientResponse {
   success: boolean;
