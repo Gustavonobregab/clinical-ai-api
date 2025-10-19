@@ -13,15 +13,15 @@ export const AppDataSource = new DataSource({
   entities: [Patient, Note],
   synchronize: true,
   logging: false,
-  ssl: env.NODE_ENV === 'production' ? {
+  ssl: env.DB_HOST.includes('rds.amazonaws.com') ? {
     rejectUnauthorized: false
   } : false,
 });
 
 export const initializeDatabase = async () => {
   try {
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('SSL config:', env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
+    console.log('DB_HOST:', env.DB_HOST);
+    console.log('SSL enabled:', env.DB_HOST.includes('rds.amazonaws.com'));
     await AppDataSource.initialize();
     console.log('Database connected successfully');
   } catch (error) {
