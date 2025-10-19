@@ -1,7 +1,7 @@
 name: Deploy to AWS Elastic Beanstalk
 
 on:
-  workflow_dispatch:  # Deploy manual apenas
+  workflow_dispatch: 
 
 jobs:
   deploy:
@@ -35,7 +35,7 @@ jobs:
         pip install awsebcli
         
     - name: Deploy to Elastic Beanstalk
-      run: eb deploy --staged
+      run: eb deploy
       env:
         NODE_ENV: production
         PORT: 3000
