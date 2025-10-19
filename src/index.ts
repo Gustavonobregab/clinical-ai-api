@@ -11,7 +11,17 @@ dotenv.config();
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://clinical-ai-api.onrender.com', 'https://your-frontend-domain.com']
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

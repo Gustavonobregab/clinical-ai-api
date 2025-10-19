@@ -13,9 +13,9 @@ export const AppDataSource = new DataSource({
   entities: [Patient, Note],
   synchronize: true,
   logging: false,
-  ssl: {
+  ssl: env.NODE_ENV === 'production' ? {
     rejectUnauthorized: false
-  },
+  } : false,
 });
 
 export const initializeDatabase = async () => {
