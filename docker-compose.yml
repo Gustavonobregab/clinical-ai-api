@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  app:
+    build: .
+    container_name: clinical-ai-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - DB_DATABASE=clinical_ai_db
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    volumes:
+      - uploads:/app/uploads
+    restart: unless-stopped
+
   postgres:
     image: postgres:15
     container_name: clinical-ai-postgres
@@ -28,4 +48,5 @@ services:
 
 volumes:
   postgres_data:
+  uploads:
 
