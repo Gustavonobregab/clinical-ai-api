@@ -13,6 +13,9 @@ export const AppDataSource = new DataSource({
   entities: [Patient, Note],
   synchronize: true,
   logging: false,
+  ssl: {
+    rejectUnauthorized: false
+  },
 });
 
 export const initializeDatabase = async () => {
