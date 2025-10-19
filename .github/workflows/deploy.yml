@@ -37,8 +37,12 @@ jobs:
       run: |
         pip install awsebcli
         
+    - name: Initialize EB CLI
+      run: |
+        eb init clinical-ai-api --region us-east-2 --platform "Docker running on 64bit Amazon Linux 2023"
+        
     - name: Deploy to Elastic Beanstalk
-      run: eb deploy
+      run: eb deploy clinical-ai-env
       env:
         NODE_ENV: production
         PORT: 3000
