@@ -20,6 +20,8 @@ export const AppDataSource = new DataSource({
 
 export const initializeDatabase = async () => {
   try {
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('SSL config:', env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
     await AppDataSource.initialize();
     console.log('Database connected successfully');
   } catch (error) {
