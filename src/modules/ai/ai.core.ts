@@ -36,8 +36,9 @@ Provide key insights extracted from the note:
 
 ---
 
-### 3️⃣ ICD-10 CODES
-Suggest ICD-10 diagnostic codes with official code and description.
+### 3️⃣ ICD-10 CODES (REQUIRED)
+**MUST provide at least 1-3 relevant ICD-10 diagnostic codes** with official code and description.
+Always extract codes based on symptoms, conditions, or diagnoses mentioned.
 Example:
 [
   { "code": "I10", "description": "Essential (primary) hypertension" },
@@ -46,28 +47,30 @@ Example:
 
 ---
 
-### 4️⃣ OASIS (Outcome and Assessment Information Set)
-Extract structured fields relevant to home-health documentation.
-Include only if information is available.
-Example:
+### 4️⃣ OASIS (Outcome and Assessment Information Set) (REQUIRED)
+**MUST provide OASIS assessment fields** - extract from available information or infer from clinical context.
+Required fields:
 {
-  "mobility": "Independent",
-  "pain_level": "Moderate",
-  "cognitive_function": "Intact",
-  "assistive_device": "Cane",
-  "medication_management": "Self-managed"
+  "mobility": "Independent/Assisted/Dependent",
+  "pain_level": "None/Mild/Moderate/Severe",
+  "cognitive_function": "Intact/Impaired/Severely impaired",
+  "assistive_device": "None/Cane/Walker/Wheelchair",
+  "medication_management": "Self-managed/Assisted/Dependent",
+  "adl_status": "Independent/Assisted/Dependent",
+  "safety_concerns": "None/Moderate/High"
 }
 
 ---
 
-### 5️⃣ DISCHARGE REPORT
-If applicable, summarize patient status at discharge:
+### 5️⃣ DISCHARGE REPORT (REQUIRED)
+**MUST provide discharge information** - extract from note or infer from clinical context:
 {
-  "date": "YYYY-MM-DD",
-  "admission_reason": "Reason for care",
+  "date": "YYYY-MM-DD or 'Not specified'",
+  "admission_reason": "Primary reason for care",
   "treatment_summary": "Summary of care provided",
-  "progress": "Clinical progress",
-  "follow_up_recommendations": "Next steps after discharge"
+  "progress": "Clinical progress made",
+  "follow_up_recommendations": "Specific next steps",
+  "discharge_status": "Stable/Improved/Unchanged/Deteriorated"
 }
 
 ---
@@ -99,7 +102,10 @@ Return a single valid JSON object with this exact structure:
 - Return **only valid JSON** (no markdown or explanations).
 - Use precise clinical terminology.
 - Include realistic and clinically relevant details.
-- If a section is not applicable, return an empty object or array.
+- **NEVER return empty objects or arrays** - always provide meaningful data.
+- **ICD-10 codes**: Must have at least 1-3 codes based on symptoms/conditions.
+- **OASIS**: Must fill all required fields with appropriate values.
+- **Discharge report**: Must provide all fields, use "Not specified" if unknown.
 - Maintain compliance with standard medical documentation practices.
 
 ---

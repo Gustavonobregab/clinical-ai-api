@@ -97,20 +97,28 @@ export const processNoteService = async (noteId: number): Promise<Note> => {
   try {
     const aiReport = await generateSummaryAndInsights(note.rawText);
 
+
+
     note.summary = typeof aiReport.summary === 'string' ? JSON.parse(aiReport.summary) : aiReport.summary;
+    
+    const existingAiMeta = note.aiMeta || {};
     note.aiMeta = {
+      ...existingAiMeta,
       insights: aiReport.insights,
-      icd10_codes: aiReport.icd10_codes || [],
-      oasis: aiReport.oasis || {},
-      discharge_report: aiReport.discharge_report || {},
-      processedAt: new Date().toISOString()
+      icd10_codes: aiReport.icd10_codes,
+      oasis: aiReport.oasis,
+      discharge_report: aiReport.discharge_report,
+      processedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     note.status = 'PROCESSED';
 
     return await noteRepo.save(note);
   } catch (error) {
     note.status = 'FAILED';
+    const existingAiMeta = note.aiMeta || {};
     note.aiMeta = {
+      ...existingAiMeta,
       error: error instanceof Error ? error.message : 'Unknown error',
       failedAt: new Date().toISOString()
     };
