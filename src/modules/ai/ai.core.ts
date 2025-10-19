@@ -12,60 +12,115 @@ export async function generateSummaryAndInsights(text: string) {
   }
 
   const prompt = `
-You are an AI clinical documentation assistant.
+You are an AI clinical documentation assistant specialized in structuring and coding healthcare provider notes.
 
-Your task is to **analyze and summarize** the following clinical note provided by a healthcare professional.
+Your task is to analyze the following clinical note and return **five clearly separated structured outputs**:
+SOAP summary, clinical insights, ICD-10 diagnostic codes, OASIS assessment fields, and a discharge summary.
 
-### Instructions:
-1. Summarize the note using the **SOAP** format:
-   - **S (Subjective):** Patient-reported information, symptoms, and concerns.
-   - **O (Objective):** Clinically observed or measured data (vitals, exam findings, tests).
-   - **A (Assessment):** Clinician's interpretation, diagnoses, or impressions.
-   - **P (Plan):** Next steps, treatments, medications, or follow-up recommendations.
+---
 
-2. Identify structured **insights** in JSON format, including:
-   - **follow_ups:** list of recommended follow-up actions or check-ins.
-   - **risk_flags:** potential clinical risks or urgent issues (e.g., "fall risk", "infection", "non-compliance").
-   - **keywords:** relevant terms, symptoms, medications, or findings extracted from the note.
+### 1️⃣ SOAP FORMAT SUMMARY
+- **Subjective (S):** Patient-reported symptoms, complaints, and history.
+- **Objective (O):** Clinically observed findings, vitals, and test results.
+- **Assessment (A):** Diagnoses or impressions.
+- **Plan (P):** Treatments, procedures, and follow-up recommendations.
 
-3. The output **must be valid JSON only**, no explanations, markdown, or prose.
+---
 
-### Example JSON output:
+### 2️⃣ CLINICAL INSIGHTS
+Provide key insights extracted from the note:
+- **Follow-ups:** Specific next actions with deadlines and responsible parties.
+- **Risk flags:** Potential medical or safety risks with severity.
+- **Keywords:** Relevant symptoms, conditions, body systems, and medications.
+- **Urgency level:** routine / urgent / emergent.
+
+---
+
+### 3️⃣ ICD-10 CODES
+Suggest ICD-10 diagnostic codes with official code and description.
+Example:
+[
+  { "code": "I10", "description": "Essential (primary) hypertension" },
+  { "code": "E11.9", "description": "Type 2 diabetes mellitus without complications" }
+]
+
+---
+
+### 4️⃣ OASIS (Outcome and Assessment Information Set)
+Extract structured fields relevant to home-health documentation.
+Include only if information is available.
+Example:
 {
-  "summary": {
-    "subjective": "...",
-    "objective": "...",
-    "assessment": "...",
-    "plan": "..."
-  },
-  "insights": {
-    "follow_ups": [
-      { "action": "Schedule blood test", "due_in_days": 7 }
-    ],
-    "risk_flags": [
-      { "name": "High blood pressure", "severity": "moderate" }
-    ],
-    "keywords": ["hypertension", "fatigue", "diet"]
-  }
+  "mobility": "Independent",
+  "pain_level": "Moderate",
+  "cognitive_function": "Intact",
+  "assistive_device": "Cane",
+  "medication_management": "Self-managed"
 }
 
-### Clinical note:
+---
+
+### 5️⃣ DISCHARGE REPORT
+If applicable, summarize patient status at discharge:
+{
+  "date": "YYYY-MM-DD",
+  "admission_reason": "Reason for care",
+  "treatment_summary": "Summary of care provided",
+  "progress": "Clinical progress",
+  "follow_up_recommendations": "Next steps after discharge"
+}
+
+---
+
+### 6️⃣ FINAL OUTPUT FORMAT
+Return a single valid JSON object with this exact structure:
+
+{
+  "summary": {
+    "subjective": "",
+    "objective": "",
+    "assessment": "",
+    "plan": ""
+  },
+  "insights": {
+    "follow_ups": [],
+    "risk_flags": [],
+    "keywords": [],
+    "urgency_level": ""
+  },
+  "icd10_codes": [],
+  "oasis": {},
+  "discharge_report": {}
+}
+
+---
+
+### 7️⃣ RULES
+- Return **only valid JSON** (no markdown or explanations).
+- Use precise clinical terminology.
+- Include realistic and clinically relevant details.
+- If a section is not applicable, return an empty object or array.
+- Maintain compliance with standard medical documentation practices.
+
+---
+
+### CLINICAL NOTE TO ANALYZE:
 """${text}"""
 
-### Output format:
-Return a **single JSON object** exactly matching the structure above.
-  `;
+Now return the JSON object only.
+`;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    temperature: 0.2, 
+    temperature: 0.2,
     messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" } 
+    response_format: { type: "json_object" }
   });
 
   const content = response.choices[0].message?.content ?? "{}";
   return JSON.parse(content);
 }
+
 
 export async function transcribeAudio(audioUrl: string): Promise<string> {
   if (!openai) {

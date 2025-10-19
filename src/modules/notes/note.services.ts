@@ -97,9 +97,12 @@ export const processNoteService = async (noteId: number): Promise<Note> => {
   try {
     const aiReport = await generateSummaryAndInsights(note.rawText);
 
-    note.summary = aiReport.summary;
+    note.summary = typeof aiReport.summary === 'string' ? JSON.parse(aiReport.summary) : aiReport.summary;
     note.aiMeta = {
       insights: aiReport.insights,
+      icd10_codes: aiReport.icd10_codes || [],
+      oasis: aiReport.oasis || {},
+      discharge_report: aiReport.discharge_report || {},
       processedAt: new Date().toISOString()
     };
     note.status = 'PROCESSED';
