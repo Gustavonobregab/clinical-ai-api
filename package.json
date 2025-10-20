@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "db:sync": "ts-node src/scripts/sync-database.ts",
+    "seed": "ts-node src/scripts/seed.ts",
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "keywords": [
