@@ -6,15 +6,16 @@ dotenv.config();
 import app from './index';
 import { initializeDatabase } from './config/database';
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = '0.0.0.0'; 
 
 const startServer = async () => {
   try {
     await initializeDatabase();
-    
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Health check: http://localhost:${PORT}/health`);
+
+    app.listen(PORT, HOST, () => {
+      console.log(`Server running on http://${HOST}:${PORT}`);
+      console.log(`Health check: http://${HOST}:${PORT}/health`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
