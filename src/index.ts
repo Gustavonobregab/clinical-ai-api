@@ -10,7 +10,6 @@ dotenv.config();
 
 const app = express();
 
-app.use(helmet());
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
@@ -22,6 +21,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
